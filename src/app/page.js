@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -29,25 +29,48 @@ export default function Home() {
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     // 物体の材質
     const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const parentMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
 
+    // 親キューブの作成
+    const parentCube = new THREE.Mesh(geometry, parentMaterial);
+
+    // 子キューブの作成
     const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
 
+    // 親キューブに子キューブを追加
+    parentCube.add(cube);
+    parentCube.position.set(-3, 0, 0); // 親キューブの位置設定
+
+    // 子キューブの位置設定
+    cube.position.set(3, 0, 0);
+    // スケールの拡大
+    // parentCube.scale.set(2, 2, 2)
+    // cube.scale.set(2, 2, 2)
+    // キューブの回転
+    cube.rotation.x = Math.PI / 4;
+
+    // 親キューブをシーンに追加
+    scene.add(parentCube);
+
+    // カメラの位置設定
     camera.position.z = 5;
     camera.position.y = 2;
     camera.position.x = 2;
     camera.lookAt(0, 0, 0);
 
-    const axesHelper = new THREE.AxesHelper(5)
-    scene.add(axesHelper)
+    // 座標軸の表示
+    const axesHelper = new THREE.AxesHelper(5);
+    scene.add(axesHelper);
+
+    // 座標コントローラーの作成
+    const controls = new OrbitControls(camera, canvasRef.current);
+    controls.enableDamping = true; // 慣性を有効にする
+    controls.dampingFactor = 0.09; // 慣性の摩擦指数
 
     // アニメーション関数
     function animate() {
+      controls.update(); // 毎フレームコントロールを更新
       requestAnimationFrame(animate);
-
-      // キューブを回転させる
-      // cube.rotation.x += 0.01;
-      // cube.rotation.y += 0.01;
 
       renderer.render(scene, camera);
     }
