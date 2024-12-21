@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js'
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -77,11 +78,24 @@ export default function Home() {
 
     animate();
 
-    // クリーンアップ関数でリソース解放
-    return () => {
-      // renderer から canvas を明示的に削除する処理は不要
-      // 代わりに、canvasRef が指す DOM 要素がアンマウントされるので、その際に自動的に解放される
-    };
+    window.addEventListener('resize', () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix()
+    })
+
+    let eventObj = {
+      Fullscreen: function () {
+        document.body.requestFullscreen();
+      },
+      ExitFullscreen: function () {
+        document.exitFullscreen()
+      },
+    }
+    const gui = new GUI();
+    gui.add(eventObj, 'Fullscreen').name('フルスクリーン');
+    gui.add(eventObj, 'ExitFullscreen').name('退出');
+
   }, []);
 
   return (
